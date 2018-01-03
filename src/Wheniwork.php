@@ -10,14 +10,15 @@
  * Daniel Olfelt <daniel@thisclicks.com>
  *
  * @author Daniel Olfelt <daniel@thisclicks.com>
- * @version 0.1
+ * @author Conner McCall <conner@wheniwork.com>
+ * @version 0.2
  */
 class Wheniwork
 {
     /**
      * Library Version
      */
-    const VERSION = '0.1';
+    const VERSION = '0.2';
 
     /**
      * HTTP Methods
@@ -32,6 +33,7 @@ class Wheniwork
     private $api_endpoint = 'https://api.wheniwork.com/2';
     private $api_headers  = [];
     private $verify_ssl   = false;
+    private $user_agent   = 'WhenIWork-PHP';
 
     /**
      * Create a new instance
@@ -43,11 +45,16 @@ class Wheniwork
     {
         $this->api_token = $api_token;
 
+        $this->user_agent = $this->user_agent . '/' . static::VERSION;
+        
         if (!empty($options['endpoint'])) {
             $this->setEndpoint($options['endpoint']);
         }
         if (!empty($options['headers'])) {
             $this->setHeaders($options['headers'], true);
+        }
+        if (!empty($options['user_agent'])) {
+            $this->setUserAgent($options['user_agent'], true);
         }
     }
 
@@ -60,6 +67,19 @@ class Wheniwork
     public function setToken($api_token)
     {
         $this->api_token = $api_token;
+
+        return $this;
+    }
+
+    /**
+     * Set the user agent for all requests
+     *
+     * @param string $user_agent The user agent sent with each request
+     * @return Wheniwork
+     */
+    public function setUserAgent($user_agent)
+    {
+        $this->user_agent = $user_agent;
 
         return $this;
     }
@@ -210,7 +230,7 @@ class Wheniwork
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_USERAGENT, 'WhenIWork-PHP/' . static::VERSION);
+        curl_setopt($ch, CURLOPT_USERAGENT, $this->user_agent);
 
         $headers += $this->getHeaders();
 
